@@ -48,3 +48,4 @@ pub fn save_settings(settings: &AppSettings) -> Result<(), String> {
 
     Ok(())
 }
+

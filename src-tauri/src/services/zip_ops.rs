@@ -66,3 +66,4 @@ pub fn create_zip_archive(files: &[String], output_zip_path: &str) -> Result<(),
 pub fn extract_zip_archive(zip_path: &str, destination_dir: &str) -> Result<Vec<String>, String> {
     safe_extract_zip(zip_path, destination_dir)
 }
+

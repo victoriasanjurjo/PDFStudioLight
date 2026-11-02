@@ -153,3 +153,4 @@ pub fn load_settings() -> Result<AppSettings, String> {
 pub fn save_settings(settings: AppSettings) -> Result<(), String> {
     settings_service::save_settings(&settings)
 }
+

@@ -81,3 +81,4 @@ class SignaturePad {
 }
 
 window.SignaturePad = SignaturePad;
+
