@@ -1,0 +1,24 @@
+## .NET & Visual Studio
+[Bb]in/
+[Oo]bj/
+dist/
+build/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## WinUI / Windows App SDK
+Generated Files/
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+
+## Temporal & Logs
+*.log
+*.tmp
+outputs/*.pdf
+outputs/*.png
+outputs/*.zip

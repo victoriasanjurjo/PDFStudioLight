@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PDFStudioLight.Views.CompressPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:PDFStudioLight.Models"
+    mc:Ignorable="d">
+
+    <Grid Padding="24" RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Encabezado -->
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="Comprimir y Empaquetar" Style="{ThemeResource TitleTextBlockStyle}" />
+            <TextBlock Text="Reduce el peso de tus documentos PDF mediante compresión o gestiónalos en contenedores ZIP."
+                       Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <!-- Pestañas o Selector de Modo -->
+        <Pivot Grid.Row="1">
+            <!-- Pestaña 1: Comprimir PDF -->
+            <PivotItem Header="Comprimir PDF">
+                <Grid Padding="0,16,0,0">
+                    <StackPanel Spacing="16" MaxWidth="600" HorizontalAlignment="Left">
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Documento a Optimizar" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <TextBlock Text="{x:Bind ViewModel.CompressFileName, Mode=OneWay}" Style="{ThemeResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{x:Bind ViewModel.OriginalSizeText, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <Button Content="Seleccionar PDF" Command="{x:Bind ViewModel.SelectPdfToCompressCommand}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16"
+                                Visibility="{x:Bind ViewModel.HasFileToCompress, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Optimización de Flujos" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <TextBlock Text="Aplica compresión Flate a flujos de objetos y optimiza fuentes e imágenes integradas."
+                                           Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <Button Content="Comprimir y Guardar..." Command="{x:Bind ViewModel.CompressPdfCommand}" Style="{ThemeResource AccentButtonStyle}" />
+                                <TextBlock Text="{x:Bind ViewModel.CompressedResultText, Mode=OneWay}" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <!-- Pestaña 2: Herramientas ZIP -->
+            <PivotItem Header="Empaquetador ZIP">
+                <Grid Padding="0,16,0,0" RowSpacing="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <CommandBar Grid.Row="0" DefaultLabelPosition="Right" HorizontalAlignment="Left" Background="Transparent">
+                        <AppBarButton Icon="Add" Label="Agregar Archivos" Command="{x:Bind ViewModel.AddFilesToZipCommand}" />
+                        <AppBarButton Icon="Clear" Label="Limpiar Lista" Command="{x:Bind ViewModel.ClearZipItemsCommand}" />
+                        <AppBarSeparator />
+                        <AppBarButton Icon="ZipFolder" Label="Crear Archivo ZIP" Command="{x:Bind ViewModel.CreateZipCommand}" />
+                        <AppBarButton Icon="Folder" Label="Descomprimir un ZIP" Command="{x:Bind ViewModel.ExtractZipCommand}" />
+                    </CommandBar>
+
+                    <Border Grid.Row="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                        <ListView ItemsSource="{x:Bind ViewModel.ZipItems}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:DocumentItem">
+                                    <Grid Padding="6" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Grid.Column="0" Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind FileName}" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                                            <TextBlock Text="{x:Bind FilePath}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{x:Bind FileSizeFormatted}" Style="{ThemeResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Border>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+
+        <!-- Estado -->
+        <Grid Grid.Row="2">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <ProgressRing IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Width="18" Height="18" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+                <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
+

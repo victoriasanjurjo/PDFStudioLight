@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PDFStudioLight (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "PDFStudioLight (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
