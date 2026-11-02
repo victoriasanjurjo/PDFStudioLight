@@ -1,115 +1,120 @@
-# PDF Studio Light
+# PDF Studio Light (Tauri v2 + Rust)
 
-![.NET](https://img.shields.io/badge/.NET-8.0%20LTS-512BD4)
-![WinUI 3](https://img.shields.io/badge/GUI-WinUI%203-0078D7)
-![MVVM](https://img.shields.io/badge/Architecture-MVVM-00A4EF)
-![Engine](https://img.shields.io/badge/Engine-PdfSharp%20%2B%20Windows.Data.Pdf-0284C7)
-![Privacy](https://img.shields.io/badge/Privacy-100%25_Local_%26_Offline-green)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-blue.svg)](https://v2.tauri.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
+[![Offline First](https://img.shields.io/badge/Privacy-100%25%20Offline-success.svg)](#seguridad-y-privacidad)
 
-**PDF Studio Light** es una suite de escritorio nativa para Windows (10 y 11) desarrollada en **C# (.NET 8)** con **WinUI 3 (Windows App SDK)** y el patrón arquitectónico **MVVM (Model-View-ViewModel)**. 
+**PDF Studio Light** es una suite de herramientas de escritorio nativa, moderna y de alto rendimiento diseñada para la visualización, unión, división, edición, compresión, firmado y conversión de documentos PDF e imágenes.
 
-La herramienta está diseñada para brindar una experiencia moderna, fluida y rápida para la edición, firma, combinación, división, compresión y conversión de documentos PDF, garantizando **soberanía total y privacidad 100% local**: ninguna operación transmite datos ni telemetría fuera de tu equipo.
+Construida desde cero con **Rust** y el runtime de **Tauri v2**, la aplicación opera bajo una estricta filosofía **100% Local-First**: no envía telemetría, no realiza peticiones a la nube y mantiene todos los datos estrictamente dentro de tu equipo local con protecciones integradas contra ataques de desbordamiento de rutas y agotamiento de recursos.
 
 ---
 
 ## 🚀 Características Principales
 
-La aplicación incorpora una barra lateral basada en `NavigationView` con botón de tres rayitas (`☰`) para expandir o colapsar el menú, organizando las 9 herramientas:
-
-1. 📝 **Editar PDF**: Visor con miniaturas generadas de forma nativa por hardware, rotación de páginas en 90°, eliminación de páginas y botón *Guardar Como...*.
-2. 🔗 **Unir PDF**: Combinación de dos o más documentos con reordenamiento interactivo (*Subir* / *Bajar*).
-3. ✂️ **Separar PDF**: División en páginas individuales (un archivo por página) o extracción selectiva por rangos personalizados (ej. `1-3, 5, 8-10`).
-4. 🖼️ **Agregar Imagen**: Selección de cualquier imagen (PNG, JPG, BMP) e incrustación precisa con coordenadas o preajustes rápidos (*Abajo Derecha*, *Centro*, etc.).
-5. ✍️ **Firmar Digitalmente**: Pizarra digital interactiva con trazo suave a mano alzada (mouse o lápiz táctil), grosor y color personalizable, con opciones para exportar como PNG transparente o estampar directamente en cualquier página del PDF.
-6. 🗜️ **Comprimir y Empaquetar**: Optimización y recompresión interna de flujos de PDFs (con cálculo de porcentaje de ahorro) y empaquetador/extractor de archivos ZIP.
-7. 📸 **Convertir Imágenes a PDF**: Ensamblado de múltiples fotos e imágenes en un PDF multipágina con alta fidelidad y ajuste proporcional.
-8. ❓ **Centro de Ayuda y Privacidad**: Guía de uso completa y certificación formal de privacidad 100% fuera de línea (*Offline*).
-9. ⚙️ **Configuración**: Conmutador dinámico de **Modo Claro** / **Modo Oscuro** / **Sistema** y selector de carpeta de guardado predeterminada.
-
----
-
-## 📂 Archivos de Prueba en la Raíz
-
-Para verificar las funciones inmediatamente tras la compilación, se conservan los archivos de muestra:
-- **`ejemplo_documento.pdf`**: Documento multipágina con cláusulas de servicios y recuadro para ensayar firmas y sellos.
-- **`ejemplo_imagen.png`**: Sello gráfico transparente (*"Aprobado y Firmado"*) para probar la incrustación de imágenes en la herramienta *Agregar Imagen*.
+1. **📑 Unir PDFs:** Combina múltiples archivos PDF en un solo documento conservando marcadores y estructura interna.
+2. **✂️ Dividir PDF:** Extrae páginas individuales en lote o divide el documento en grupos mediante expresiones de rangos flexibles (ej. `1-3, 5, 8-10`).
+3. **📝 Organizar y Rotar Páginas:** Reordena, elimina y rota páginas individuales (`0°`, `90°`, `180°`, `270°`) con previsualización reactiva.
+4. **🗜️ Comprimir PDF & Empaquetador ZIP:**
+   - Optimiza flujos binarios internos de objetos PDF (`flate`) reduciendo el peso en disco.
+   - Crea archivos comprimidos `.zip` con compresión óptima y extracción segura.
+5. **🖼️ Incrustar Sellos o Imágenes:** Inserta logotipos, sellos o membretes en coordenadas exactas (`X`, `Y`) y dimensiones personalizadas.
+6. **✍️ Firma Digital Gráfica:** Dibuja firmas a mano alzada en un lienzo transparente con grosor dinámico o carga firmas existentes en formato PNG/JPG para estamparlas con soporte de máscara de transparencia (`SMask`).
+7. **🖼️➡️📄 Convertir Imágenes a PDF:** Convierte colecciones de imágenes (`PNG`, `JPG`, `JPEG`, `BMP`) en un documento PDF multipágina.
+8. **⚙️ Configuración y Temas:** Modo Oscuro y Claro con detección automática de preferencias del sistema operativo y rutas personalizables.
 
 ---
 
-## 🏗️ Arquitectura y Componentes
+## 🛡️ Seguridad y Privacidad (Local-First)
 
-El proyecto sigue una estructura limpia y desacoplada mediante inyección de dependencias (`Microsoft.Extensions.DependencyInjection`):
+- **Prevención de Zip Slip:** Validación estricta de rutas canónicas en `security::safe_extract_zip` impidiendo que entradas maliciosas (`../`) sobrepasen el directorio de extracción.
+- **Mitigación de Zip Bombs:** Límite máximo de descompresión de 1 GB y tope de 5.000 entradas para prevenir denegación de servicio (DoS).
+- **Filtro de Nombres Reservados en Windows:** Bloqueo automático de nombres reservados del sistema (`CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, `LPT1-9`).
+- **Cuotas de Tamaño:** Protección contra archivos inflados (límite de 500 MB para PDFs y 100 MB para imágenes).
 
-```text
+---
+
+## 🏛️ Arquitectura del Sistema
+
+La arquitectura desacopla el núcleo de cálculo intensivo del renderizado de la interfaz mediante el bus IPC seguro de Tauri v2:
+
+```
 PDFStudioLight/
-├── assets/                         # Recursos gráficos e íconos (.ico, .png, .svg)
-├── config/                         # Ajustes persistentes locales (settings.json)
-├── docs/                           # Documentación técnica, justificaciones y changelog
-├── outputs/                        # Carpeta sugerida para documentos de salida
-├── tests/
-│   └── PDFStudioLight.Tests/       # Pruebas unitarias automatizadas con xUnit
-│       ├── PdfServiceTests.cs      # Pruebas de unión, división, compresión y ZIP
-│       └── PDFStudioLight.Tests.csproj
-├── src/
-│   └── PDFStudioLight/             # Aplicación de escritorio nativa WinUI 3
-│       ├── Assets/                 # Ícono oficial de la aplicación (AppIcon.ico)
-│       ├── Converters/             # Conversores de enlaces de datos XAML
-│       ├── Models/                 # Modelos de datos (PdfPageThumbnail, DocumentItem, AppSettings)
-│       ├── Services/               # Servicios (PdfService, DialogService, SettingsService)
-│       ├── ViewModels/             # ViewModels para cada herramienta (CommunityToolkit.Mvvm)
-│       ├── Views/                  # Páginas XAML con diseño moderno y Fluent Design
-│       ├── App.xaml / App.xaml.cs  # Inicialización, temas y contenedor de servicios (DI)
-│       ├── MainWindow.xaml         # Ventana principal con TitleBar personalizada y Mica
-│       ├── MainPage.xaml           # NavigationView con menú lateral colapsable
-│       └── PDFStudioLight.csproj   # Configuración de compilación .NET 8 Unpackaged
-├── PDFStudioLight.slnx             # Solución completa .NET
-├── LICENSE.txt                     # Licencia MIT completa y vigente
-└── README.md                       # Documentación general y guía de ejecución
+├── Cargo.toml                    # Workspace de Rust
+├── src-tauri/                    # Backend Nativo (Rust + Tauri v2)
+│   ├── Cargo.toml                # Dependencias (tauri, lopdf, image, zip, serde)
+│   ├── build.rs                  # Script de compilación de Tauri
+│   ├── tauri.conf.json           # Configuración de ventana, empaquetado e íconos
+│   ├── capabilities/             # Permisos de Tauri v2 (default.json)
+│   ├── icons/                    # Íconos nativos (.ico, .png)
+│   └── src/
+│       ├── main.rs               # Entrypoint del ejecutable de Windows
+│       ├── lib.rs                # Registro de plugins y controladores IPC
+│       ├── models/               # Structs serializables con Serde
+│       ├── services/             # Motores de PDF, ZIP, seguridad y ajustes
+│       └── commands/             # Handlers expuestos al frontend
+├── ui/                           # Frontend Nativo (HTML5 / CSS3 / ES6)
+│   ├── index.html                # Estructura principal y navegación
+│   ├── css/
+│   │   └── style.css             # Estilos responsivos y temas Claro/Oscuro
+│   ├── js/
+│   │   ├── app.js                # Controlador de interfaz y llamadas invoke()
+│   │   └── signature.js          # Motor del lienzo de dibujo de firmas
+│   └── assets/                   # Recursos visuales e íconos
+├── assets/                       # Recursos originales del proyecto
+├── config/                       # settings.json local
+├── docs/                         # Documentación técnica y changelog
+└── tests/                        # Pruebas de integración y seguridad
 ```
 
 ---
 
 ## 🛠️ Requisitos Previos
 
-- **Sistema Operativo**: Windows 10 (versión 1809 / Build 17763 o superior) o Windows 11.
-- **SDK de .NET**: .NET SDK 8.0 o superior (compatible con .NET 10).
+- **Rust:** Toolchain estable (`1.75+`) instalada vía `rustup`:
+  ```powershell
+  rustup default stable
+  ```
+- **CLI de Tauri v2 (opcional pero recomendada para desarrollo rápido):**
+  ```powershell
+  cargo install tauri-cli --version "^2.0.0"
+  ```
+- **Microsoft C++ Build Tools** o Visual Studio con herramientas de C++ (requerido por el compilador de Rust en Windows).
 
 ---
 
-## 💻 Instrucciones de Ejecución
+## 💻 Instrucciones de Ejecución y Compilación
 
-### 1. Ejecutar las Pruebas Unitarias
-Para correr la suite de pruebas automatizadas con xUnit:
-
+### 1. Ejecutar las Pruebas Unitarias y de Seguridad
 ```powershell
-dotnet test tests/PDFStudioLight.Tests/PDFStudioLight.Tests.csproj
+cargo test
 ```
 
-### 2. Compilar la Solución Completa
-Para compilar la solución y validar todos los proyectos:
-
+### 2. Ejecutar en Modo Desarrollo con Recarga Rápida
 ```powershell
-dotnet build PDFStudioLight.slnx
+# Usando la CLI de Tauri:
+cargo tauri dev
+
+# O directamente mediante Cargo desde la carpeta src-tauri:
+cd src-tauri
+cargo run
 ```
 
-### 3. Ejecutar la Aplicación en Modo Desarrollo
-Puedes iniciar la aplicación directamente desde la línea de comandos:
-
+### 3. Compilar el Binario Independiente Standalone (.exe)
+Para generar el ejecutable optimizado para distribución y producción:
 ```powershell
-dotnet run --project src/PDFStudioLight/PDFStudioLight.csproj
+# Compilación estándar con Cargo:
+cd src-tauri
+cargo build --release
+
+# O empaquetado completo con instalador vía Tauri CLI:
+cargo tauri build
 ```
 
-### 4. Compilar el Ejecutable Listo para Usar (Publicación Autónoma)
-Para generar un binario ejecutable (`.exe`) independiente sin requerir instalación:
-
-```powershell
-dotnet publish src/PDFStudioLight/PDFStudioLight.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false
-```
-
-El ejecutable resultante estará disponible en:
+El ejecutable standalone se generará en:
 ```text
-src\PDFStudioLight\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\PDFStudioLight.exe
+src-tauri/target/release/pdf_studio_light.exe
 ```
 
 ---

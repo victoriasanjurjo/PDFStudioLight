@@ -1,33 +1,40 @@
 # Bitácora de Cambios (Changelog) - PDF Studio Light
 
+## [3.0.0] - 2026-11-02
+### Migración Completa a Rust Nativo + Tauri v2 (100% Local-First & Offline)
+
+- **Eliminación Total de Dependencias C# y .NET**:
+  - Removido WinUI 3, Windows App SDK y proyectos `.csproj` / `.slnx`.
+  - Reducción drástica del tamaño en disco y memoria de ejecución (cero sobrecarga de runtime .NET o recolector de basura).
+- **Backend de Procesamiento PDF en Rust Puro**:
+  - Implementación con crates nativos seguros en memoria: `lopdf`, `image`, `zip`, `flate2` y `serde`.
+  - Soporte de manipulación directa de flujos PDF: conteo de páginas, unión multivariable, división por rangos y páginas individuales, reordenación y rotación (`0°`, `90°`, `180°`, `270°`), compresión de flujos flate/deflate e inserción precisa de firmas y sellos gráficos con máscara alfa de transparencia (`SMask`).
+  - Conversión directa de colecciones de imágenes (PNG, JPG, BMP) a páginas individuales de PDF.
+- **Seguridad y Hardening en Rust**:
+  - Mitigación integral contra **Zip Slip** con verificación estricta de rutas canónicas en `security::safe_extract_zip`.
+  - Mitigación contra **Zip Bombs** y cuotas de seguridad estrictas (500 MB para PDFs, 100 MB para imágenes, 1 GB sin comprimir en ZIP y límite de 5.000 entradas).
+  - Bloqueo de nombres reservados del sistema (`CON`, `PRN`, `AUX`, `NUL`, etc.) y saneamiento automático de nombres de archivo.
+- **Frontend Moderno, Ligero y Adaptativo**:
+  - Interfaz web moderna (HTML5 / CSS3 / ES6 modular) sin dependencias pesadas de Node (`node_modules`).
+  - Comunicación bidireccional asíncrona mediante Tauri IPC `invoke()` con manejo limpio de errores `Result<T, String>`.
+  - Lienzo interactivo de firma digital táctil y ratón con grosor ajustable y exportación directa en PNG transparente.
+  - Conmutador de temas Claro / Oscuro con persistencia en `config/settings.json`.
+- **Suite de Pruebas Unitarias y de Seguridad en Rust**:
+  - Pruebas en `tests/security_tests.rs` verificando todas las mitigaciones de seguridad y parseo seguro de rangos.
+
+---
+
 ## [2.1.0] - 2026-11-02
 ### Auditoría de Seguridad, Hardening y Mitigación de Vulnerabilidades
 
-- **Auditoría Ofensiva / Defensiva de Código**:
-  - Identificación y parcheo de vector de ejecución arbitraria de comandos en `SettingsViewModel` (`UseShellExecute = true` reemplazado por invocación estricta y segura de `explorer.exe`).
-  - Mitigación integral contra ataques **Zip Slip / Path Traversal** durante la extracción de archivos comprimidos mediante validación canónica de rutas (`SecurityValidator.SafeExtractZip`).
-  - Mitigación contra ataques de denegación de servicio por archivos descomprimidos (**Zip Bombs**) con umbrales acumulativos de descompresión (tope de 1 GB y 5.000 entradas).
-  - Mitigación contra colisiones y vulnerabilidades de nombres de dispositivos reservados de Windows (`CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, `LPT1-9`).
-  - Saneamiento y filtrado de caracteres maliciosos en nombres de archivos generados y divididos.
-  - Validación de extensiones permitidas y límites de tamaño máximo para PDFs (500 MB) e imágenes (100 MB).
-- **Suite de Pruebas de Seguridad Automatizadas**:
-  - Incorporación de `SecurityTests.cs` en `tests/PDFStudioLight.Tests` (13 pruebas unitarias y de hardening superadas al 100%).
+- Parcheo de vector de ejecución arbitraria de comandos en `SettingsViewModel`.
+- Mitigación contra Zip Slip / Path Traversal en `SafeExtractZip`.
+- Mitigación contra Zip Bombs y nombres reservados de Windows.
+- Validación de extensiones permitidas y límites de tamaño.
+
+---
 
 ## [2.0.0] - 2026-11-02
-### Migración Completa de Python a C# / WinUI 3 con MVVM
+### Migración de Python a C# / WinUI 3 con MVVM
 
-- **Reescritura de Arquitectura Completa**:
-  - Eliminación total del stack en Python (PySide6 / PyMuPDF / PyInstaller).
-  - Creación de la solución moderna .NET 8 con **WinUI 3 (Windows App SDK)** en modo independiente desempaquetado (*Unpackaged*).
-  - Adopción integral del patrón **MVVM** mediante **CommunityToolkit.Mvvm** e inyección de dependencias con `Microsoft.Extensions.DependencyInjection`.
-- **Nuevo Motor de Procesamiento**:
-  - Implementación de `IPdfService` y `PdfService` con `PdfSharp` v6.1.1 (Licencia MIT) para operaciones de unión, división por rangos, rotación, eliminación e inserción de imágenes.
-  - Integración con la API nativa de Windows `Windows.Data.Pdf` para renderizado acelerado por hardware de miniaturas y previsualización.
-- **Suite de 9 Herramientas en Interfaz Fluent Design**:
-  - Menú lateral moderno con `NavigationView` y botón hamburguesa (`☰`) colapsable.
-  - Fondo translúcido con efecto *Mica* y barra de título personalizada con el ícono de la aplicación.
-  - Pizarra de firma digital a mano alzada con exportación transparente y estampado directo en PDFs.
-  - Compresión y empaquetador ZIP integrado con `System.IO.Compression`.
-  - Conmutador en tiempo real de temas Claro y Oscuro.
-- **Suite de Pruebas Automatizadas**:
-  - Proyecto `tests/PDFStudioLight.Tests` con `xUnit`, cubriendo validaciones de conteo de páginas, combinación, división por rangos, descompresión y compresión.
+- Implementación inicial en .NET 8 / WinUI 3 Unpackaged con PdfSharp.

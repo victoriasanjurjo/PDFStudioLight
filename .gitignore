@@ -1,20 +1,11 @@
-## .NET & Visual Studio
-[Bb]in/
-[Oo]bj/
+## Rust & Cargo & Tauri
+/target/
+**/target/
+src-tauri/target/
+**/*.rs.bk
+*.pdb
 dist/
 build/
-.vs/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-## WinUI / Windows App SDK
-Generated Files/
-AppPackages/
-BundleArtifacts/
-Package.StoreAssociation.xml
-_pkginfo.txt
 
 ## Temporal & Logs
 *.log

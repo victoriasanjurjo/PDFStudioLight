@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Studio Light</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/app_icon.png" alt="PDF Studio Light" class="app-logo">
+        <div class="app-title-group">
+          <span class="app-title">PDF Studio</span>
+          <span class="app-badge">Light v2</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="tab-merge">
+          <span class="nav-icon">📑</span>
+          <span class="nav-label">Unir PDF</span>
+        </button>
+        <button class="nav-item" data-tab="tab-split">
+          <span class="nav-icon">✂️</span>
+          <span class="nav-label">Dividir PDF</span>
+        </button>
+        <button class="nav-item" data-tab="tab-edit">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">Editar Páginas</span>
+        </button>
+        <button class="nav-item" data-tab="tab-compress">
+          <span class="nav-icon">🗜️</span>
+          <span class="nav-label">Comprimir / ZIP</span>
+        </button>
+        <button class="nav-item" data-tab="tab-stamp">
+          <span class="nav-icon">🖼️</span>
+          <span class="nav-label">Incrustar Imagen</span>
+        </button>
+        <button class="nav-item" data-tab="tab-sign">
+          <span class="nav-icon">✍️</span>
+          <span class="nav-label">Firma Digital</span>
+        </button>
+        <button class="nav-item" data-tab="tab-img2pdf">
+          <span class="nav-icon">🖼️➡️📄</span>
+          <span class="nav-label">Imágenes a PDF</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" data-tab="tab-settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Configuración</span>
+        </button>
+        <button class="nav-item" data-tab="tab-help">
+          <span class="nav-icon">ℹ️</span>
+          <span class="nav-label">Ayuda</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Status Banner / Notification Bar -->
+      <div id="status-bar" class="status-bar">
+        <span id="status-text">Listo. 100% Offline & Seguro.</span>
+        <div id="loading-spinner" class="spinner hidden"></div>
+      </div>
+
+      <!-- Tab: Merge PDF -->
+      <section id="tab-merge" class="tab-panel active">
+        <div class="panel-header">
+          <h2>Unir Documentos PDF</h2>
+          <p class="subtitle">Combina múltiples archivos PDF en un solo documento organizado.</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btn-merge-add">
+            <span>➕ Agregar Archivos</span>
+          </button>
+          <button class="btn btn-secondary" id="btn-merge-up">⬆️ Subir</button>
+          <button class="btn btn-secondary" id="btn-merge-down">⬇️ Bajar</button>
+          <button class="btn btn-secondary" id="btn-merge-remove">🗑️ Quitar</button>
+          <button class="btn btn-outline" id="btn-merge-clear">Limpiar</button>
+        </div>
+
+        <div class="file-list-container" id="merge-list-container">
+          <div class="empty-placeholder" id="merge-empty">
+            <span class="placeholder-icon">📂</span>
+            <p>No hay archivos seleccionados.</p>
+            <span class="subtext">Haz clic en "Agregar Archivos" para comenzar.</span>
+          </div>
+          <ul class="file-list" id="merge-file-list"></ul>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-merge-execute" disabled>
+            ⚡ Unir PDFs y Guardar
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Split PDF -->
+      <section id="tab-split" class="tab-panel">
+        <div class="panel-header">
+          <h2>Dividir Documento PDF</h2>
+          <p class="subtitle">Extrae páginas individuales o separa por rangos específicos.</p>
+        </div>
+
+        <div class="card file-picker-card">
+          <button class="btn btn-primary" id="btn-split-select">📄 Seleccionar PDF</button>
+          <div class="selected-file-info" id="split-file-info">
+            <span class="filename" id="split-filename">Ningún archivo seleccionado</span>
+            <span class="details" id="split-details"></span>
+          </div>
+        </div>
+
+        <div class="card split-options-card">
+          <h3>Opciones de División</h3>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="split-mode" value="all" checked>
+              <span>Extraer todas las páginas en archivos individuales</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="split-mode" value="ranges">
+              <span>Dividir por rangos personalizados (Ej: 1-2, 3, 5-8)</span>
+            </label>
+          </div>
+          <div class="input-group" id="split-ranges-group" style="display:none; margin-top: 15px;">
+            <label for="split-ranges-input">Rangos de páginas:</label>
+            <input type="text" id="split-ranges-input" placeholder="Ej: 1-3, 5, 7-10">
+          </div>
+        </div>
+
+        <div class="card folder-picker-card">
+          <div class="input-group">
+            <label>Carpeta de salida:</label>
+            <div class="input-with-button">
+              <input type="text" id="split-output-dir" readonly>
+              <button class="btn btn-secondary" id="btn-split-browse-dir">Examinar...</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-split-execute" disabled>
+            ✂️ Ejecutar División
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Edit Pages -->
+      <section id="tab-edit" class="tab-panel">
+        <div class="panel-header">
+          <h2>Organizar y Rotar Páginas</h2>
+          <p class="subtitle">Elimina o rota páginas individuales de tu documento.</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btn-edit-select">📄 Cargar PDF</button>
+          <button class="btn btn-secondary" id="btn-edit-rotate-left" disabled>🔄 Rotar -90°</button>
+          <button class="btn btn-secondary" id="btn-edit-rotate-right" disabled>🔁 Rotar +90°</button>
+          <button class="btn btn-danger" id="btn-edit-delete-page" disabled>🗑️ Eliminar Página</button>
+        </div>
+
+        <div class="pages-grid-container" id="pages-grid-container">
+          <div class="empty-placeholder" id="edit-empty">
+            <span class="placeholder-icon">📑</span>
+            <p>Carga un archivo PDF para visualizar y reordenar sus páginas.</p>
+          </div>
+          <div class="pages-grid" id="pages-grid"></div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-edit-save" disabled>
+            💾 Guardar Documento Modificado
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Compress & ZIP -->
+      <section id="tab-compress" class="tab-panel">
+        <div class="panel-header">
+          <h2>Compresión y Empaquetado Seguro</h2>
+          <p class="subtitle">Reduce el peso de tus PDFs u organízalos en un archivo ZIP protegido.</p>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Col 1: PDF Optimizer -->
+          <div class="card">
+            <h3>🗜️ Optimizar Archivo PDF</h3>
+            <p class="card-desc">Comprime flujos internos y elimina redundancias sin alterar el contenido.</p>
+            <div style="margin: 15px 0;">
+              <button class="btn btn-primary" id="btn-compress-select">Seleccionar PDF</button>
+              <div id="compress-file-info" class="compact-info">Ningún PDF seleccionado</div>
+            </div>
+            <div id="compress-stats" class="stats-box" style="display:none;"></div>
+            <button class="btn btn-success" id="btn-compress-execute" disabled>Comprimir PDF</button>
+          </div>
+
+          <!-- Col 2: ZIP Package -->
+          <div class="card">
+            <h3>📦 Empaquetador ZIP</h3>
+            <p class="card-desc">Crea un archivo ZIP protegido con mitigación Zip Slip activa.</p>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="btn-zip-add">➕ Añadir Archivos</button>
+              <button class="btn btn-outline" id="btn-zip-clear">Limpiar</button>
+            </div>
+            <ul class="file-list compact-list" id="zip-file-list"></ul>
+            <div class="panel-actions-compact">
+              <button class="btn btn-success" id="btn-zip-execute" disabled>Generar Archivo ZIP</button>
+              <button class="btn btn-secondary" id="btn-zip-extract">Descomprimir ZIP...</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Add Image / Stamp -->
+      <section id="tab-stamp" class="tab-panel">
+        <div class="panel-header">
+          <h2>Incrustar Imagen o Sello</h2>
+          <p class="subtitle">Inserta logotipos, sellos o membretes en coordenadas precisas.</p>
+        </div>
+
+        <div class="grid-2col">
+          <div class="card">
+            <h3>1. Archivos Base</h3>
+            <div class="form-row">
+              <button class="btn btn-primary" id="btn-stamp-pdf">📄 Seleccionar PDF</button>
+              <span id="stamp-pdf-name" class="label-muted">Sin PDF</span>
+            </div>
+            <div class="form-row" style="margin-top: 10px;">
+              <button class="btn btn-secondary" id="btn-stamp-img">🖼️ Seleccionar Imagen</button>
+              <span id="stamp-img-name" class="label-muted">Sin imagen</span>
+            </div>
+            <div id="stamp-img-preview-container" class="preview-box"></div>
+          </div>
+
+          <div class="card">
+            <h3>2. Posicionamiento y Página</h3>
+            <div class="form-grid">
+              <label>Página destino:</label>
+              <input type="number" id="stamp-page" value="1" min="1" max="1">
+
+              <label>Posición X (puntos):</label>
+              <input type="number" id="stamp-x" value="50" min="0">
+
+              <label>Posición Y (puntos):</label>
+              <input type="number" id="stamp-y" value="50" min="0">
+
+              <label>Ancho (puntos):</label>
+              <input type="number" id="stamp-width" value="150" min="10">
+
+              <label>Alto (puntos):</label>
+              <input type="number" id="stamp-height" value="100" min="10">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-stamp-execute" disabled>
+            ✨ Incrustar en PDF y Guardar
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Digital Signature -->
+      <section id="tab-sign" class="tab-panel">
+        <div class="panel-header">
+          <h2>Firma Digital Gráfica</h2>
+          <p class="subtitle">Dibuja tu firma en el lienzo transparente o carga un archivo existente.</p>
+        </div>
+
+        <div class="grid-2col">
+          <div class="card">
+            <h3>Lienzo de Firma</h3>
+            <div class="canvas-wrapper">
+              <canvas id="signature-pad" width="480" height="200"></canvas>
+            </div>
+            <div class="canvas-toolbar">
+              <button class="btn btn-outline" id="btn-sign-clear">🧹 Limpiar Firma</button>
+              <button class="btn btn-secondary" id="btn-sign-load-img">Cargar PNG/JPG...</button>
+              <div class="stroke-control">
+                <label>Grosor:</label>
+                <input type="range" id="sign-stroke-width" min="1" max="6" value="2.5" step="0.5">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Documento y Estampado</h3>
+            <div class="form-row">
+              <button class="btn btn-primary" id="btn-sign-pdf">📄 Seleccionar PDF</button>
+              <span id="sign-pdf-name" class="label-muted">Sin PDF</span>
+            </div>
+            <div class="form-grid" style="margin-top: 15px;">
+              <label>Página a firmar:</label>
+              <input type="number" id="sign-page" value="1" min="1" max="1">
+
+              <label>Ubicación predeterminada:</label>
+              <select id="sign-placement">
+                <option value="bottom-right" selected>Inferior Derecha</option>
+                <option value="bottom-left">Inferior Izquierda</option>
+                <option value="bottom-center">Inferior Centro</option>
+                <option value="custom">Personalizada (Coordenadas)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-sign-execute" disabled>
+            🖋️ Estampar Firma en PDF
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Images to PDF -->
+      <section id="tab-img2pdf" class="tab-panel">
+        <div class="panel-header">
+          <h2>Convertir Imágenes a PDF</h2>
+          <p class="subtitle">Ensambla fotos, recibos o escaneos (PNG, JPG, BMP) en un documento PDF.</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btn-img2pdf-add">➕ Agregar Imágenes</button>
+          <button class="btn btn-secondary" id="btn-img2pdf-up">⬆️ Subir</button>
+          <button class="btn btn-secondary" id="btn-img2pdf-down">⬇️ Bajar</button>
+          <button class="btn btn-secondary" id="btn-img2pdf-remove">🗑️ Quitar</button>
+          <button class="btn btn-outline" id="btn-img2pdf-clear">Limpiar</button>
+        </div>
+
+        <div class="file-list-container">
+          <div class="empty-placeholder" id="img2pdf-empty">
+            <span class="placeholder-icon">🖼️</span>
+            <p>No hay imágenes agregadas.</p>
+          </div>
+          <ul class="file-list" id="img2pdf-file-list"></ul>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-success btn-large" id="btn-img2pdf-execute" disabled>
+            📄 Generar Documento PDF
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab: Settings -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="panel-header">
+          <h2>Configuración de la Aplicación</h2>
+          <p class="subtitle">Preferencias locales de apariencia y directorios.</p>
+        </div>
+
+        <div class="card settings-card">
+          <div class="setting-item">
+            <div class="setting-text">
+              <label class="setting-title">Tema Visual</label>
+              <span class="setting-desc">Selecciona entre modo Oscuro, Claro o basado en el Sistema.</span>
+            </div>
+            <select id="settings-theme" class="select-input">
+              <option value="Dark">Oscuro</option>
+              <option value="Light">Claro</option>
+              <option value="Default">Predeterminado del Sistema</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-text">
+              <label class="setting-title">Carpeta de Salida Predeterminada</label>
+              <span class="setting-desc">Directorio donde se sugieren guardar los documentos generados.</span>
+            </div>
+            <div class="input-with-button">
+              <input type="text" id="settings-output-dir" readonly>
+              <button class="btn btn-secondary" id="btn-settings-browse">Examinar...</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-text">
+              <label class="setting-title">Abrir carpeta al terminar</label>
+              <span class="setting-desc">Muestra la carpeta de salida automáticamente al finalizar una tarea.</span>
+            </div>
+            <input type="checkbox" id="settings-auto-open" class="checkbox-input">
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="btn-settings-save">💾 Guardar Configuración</button>
+        </div>
+      </section>
+
+      <!-- Tab: Help -->
+      <section id="tab-help" class="tab-panel">
+        <div class="panel-header">
+          <h2>Acerca de PDF Studio Light</h2>
+          <p class="subtitle">Aplicación nativa de alto rendimiento con Rust y Tauri v2.</p>
+        </div>
+
+        <div class="card help-card">
+          <h3>Arquitectura Local-First y Seguridad</h3>
+          <p>Esta aplicación opera <strong>100% de manera local y offline</strong>. Ningún documento o firma es enviado a servidores remotos.</p>
+          
+          <div class="security-highlights">
+            <div class="highlight-item">
+              <strong>🔒 Mitigación Zip Slip</strong>
+              <p>Protección contra desbordamiento o sobrescritura de directorios padre al descomprimir archivos ZIP.</p>
+            </div>
+            <div class="highlight-item">
+              <strong>🛡️ Cuotas de Memoria</strong>
+              <p>Límites estrictos de seguridad para prevenir DoS (Denegación de Servicio) por archivos inflados o Zip Bombs.</p>
+            </div>
+            <div class="highlight-item">
+              <strong>⚡ Motor Rust Nativo</strong>
+              <p>Procesamiento directo de flujos PDF mediante memoria segura con cero sobrecarga.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Custom Dialog / Modal -->
+  <div id="app-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="modal-title">Mensaje</h3>
+      <p id="modal-content"></p>
+      <div class="modal-actions" id="modal-actions">
+        <button class="btn btn-primary" id="modal-btn-ok">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/signature.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
